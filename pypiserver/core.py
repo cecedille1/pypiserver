@@ -203,6 +203,9 @@ pypi-server understands the following options:
   -o, --overwrite
     allow overwriting existing package files
 
+  --allow-upload
+    allow upload from everyone
+
 pypi-server -h
 pypi-server --help
   show this help message
@@ -251,6 +254,7 @@ def main(argv=None):
     index_url = "http://pypi.python.org/simple"
     password_file = None
     overwrite = False
+    allow_upload = False
 
     update_dry_run = True
     update_directory = None
@@ -266,6 +270,7 @@ def main(argv=None):
             "server=",
             "fallback-url=",
             "disable-fallback",
+            "allow-upload",
             "overwrite",
             "version",
             "help"
@@ -287,6 +292,8 @@ def main(argv=None):
             redirect_to_fallback = False
         elif k == "--fallback-url":
             fallback_url = v
+        elif k == '--allow-upload':
+            allow_upload = True
         elif k == "--server":
             if v not in server_names:
                 sys.exit("unknown server %r. choose one of %s" % (
@@ -329,6 +336,7 @@ def main(argv=None):
         password_file=password_file,
         fallback_url=fallback_url,
         overwrite=overwrite,
+        allow_upload=allow_upload,
     )
     server = server or "auto"
     sys.stdout.write("This is pypiserver %s serving %r on http://%s:%s\n\n" % (__version__, ", ".join(roots), host, port))

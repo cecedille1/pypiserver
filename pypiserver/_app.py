@@ -22,6 +22,7 @@ class configuration(object):
         self.fallback_url = "http://pypi.python.org/simple"
         self.redirect_to_fallback = True
         self.htpasswdfile = None
+        self.allow_upload = False
 
 config = configuration()
 
@@ -30,13 +31,15 @@ def validate_user(username, password):
     if config.htpasswdfile is not None:
         config.htpasswdfile.load_if_changed()
         return config.htpasswdfile.check_password(username, password)
+    return config.allow_upload
 
 
 def configure(root=None,
               redirect_to_fallback=True,
               fallback_url=None,
               password_file=None,
-              overwrite=False):
+              overwrite=False,
+              allow_upload=False):
     global packages
 
     if root is None:
@@ -67,6 +70,7 @@ def configure(root=None,
         from passlib.apache import HtpasswdFile
         config.htpasswdfile = HtpasswdFile(password_file)
     config.overwrite = overwrite
+    config.allow_upload = allow_upload
 
 app = Bottle()
 
