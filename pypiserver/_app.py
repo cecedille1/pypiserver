@@ -10,7 +10,7 @@ if sys.version_info >= (3, 0):
 else:
     from urlparse import urljoin
 
-from bottle import static_file, redirect, request, HTTPError, Bottle
+from bottle import static_file, redirect, request, HTTPError, Bottle, response
 from pypiserver import __version__
 from pypiserver.core import listdir, find_packages, store, get_prefixes, exists
 
@@ -234,6 +234,12 @@ def server_static(filename):
     for x in entries:
         f = x.relfn.replace("\\", "/")
         if f == filename:
+            if request.get('HTTP_SERVER', '').lower().startswith('nginx'):
+                response.headers.update({
+                    'X-Accel-Redirect': x.root + '/' + filename,
+                    'Content-Type': mimetypes.guess_type(filename)[0],
+                })
+                return None
             return static_file(filename, root=x.root, mimetype=mimetypes.guess_type(filename)[0])
 
     return HTTPError(404)
